@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -O3 -Iinclude -I$(FACIL_IO_DIR)/lib/facil -I$(FACIL_IO_DIR)/lib/facil/http -I$(FACIL_IO_DIR)/lib/facil/cli -I$(FACIL_IO_DIR)/lib/facil/fiobj -I$(FACIL_IO_DIR)/lib/facil/http/parsers -I$(FACIL_IO_DIR)/lib/facil/legacy -I$(FACIL_IO_DIR)/lib/facil/redis -I$(FACIL_IO_DIR)/lib/facil/tls -Wall -Wextra -std=gnu11 -include errno.h -D_GNU_SOURCE -DFIO_FORCE_MALLOC
+CFLAGS = -Iinclude -Isrc -I$(FACIL_IO_DIR)/lib/facil -I$(FACIL_IO_DIR)/lib/facil/http -I$(FACIL_IO_DIR)/lib/facil/cli -I$(FACIL_IO_DIR)/lib/facil/fiobj -I$(FACIL_IO_DIR)/lib/facil/http/parsers -I$(FACIL_IO_DIR)/lib/facil/legacy -I$(FACIL_IO_DIR)/lib/facil/redis -I$(FACIL_IO_DIR)/lib/facil/tls -Wall -Wextra -std=gnu11 -include errno.h -D_GNU_SOURCE -DFIO_FORCE_MALLOC
 FACIL_IO_DIR = lib/facil.io
 
 SRCDIR = src
