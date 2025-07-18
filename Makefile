@@ -31,9 +31,6 @@ clean:
 	rm -rf $(BINDIR)
 	$(MAKE) -C $(FACIL_IO_DIR) clean
 
-test:
-	$(CC) $(CFLAGS) -Isrc tests/product_model_test.c src/db/db.c app/models/generated/product.c $(LDFLAGS) -o bin/product_model_test && ./bin/product_model_test
-
 debug:
 	@$(MAKE) clean
 	@$(MAKE) CFLAGS="$(CFLAGS) -g" all
