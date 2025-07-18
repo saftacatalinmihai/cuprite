@@ -12,12 +12,18 @@ ruby scripts/generate_model.rb <model_name>
 
 This will look for `model_name.h` under `src/models` and generate the `h` and `c` files for the model in the `src/models/generated` directory, along with a migration file in `db/migrations`.
 
+### Compile app
+
+```bash
+make
+```
+
 ### Running Migrations
 
 To apply any pending database migrations, run the following command after compiling the project:
 
 ```bash
-./bin/migrate
+make migrate
 ```
 
 This will update your database schema to match the latest model definitions.
