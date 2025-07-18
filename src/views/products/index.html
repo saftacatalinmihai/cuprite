@@ -1,6 +1,9 @@
-  <h1>Products</h1>
-  <ul>
-    {{#products}}
-      <li><a href="/products/{{id}}">{{name}}</a></li>
-    {{/products}}
-  </ul>
+<h1>Products</h1>
+
+<a href="/products/new">Create new product</a>
+
+<ul>
+  {{#products}}
+    <li><a href="/products/{{id}}">{{name}}</a></li>
+  {{/products}}
+</ul>

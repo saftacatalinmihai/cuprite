@@ -17,9 +17,7 @@ void products_controller_index(http_s* request) {
     for (int i = 0; i < count; i++) {
         FIOBJ product_hash = fiobj_hash_new();
         fiobj_hash_set(product_hash, fiobj_str_new("name", 4), fiobj_str_new(products[i]->name, strlen(products[i]->name)));
-        char idStr[128];
-        sprintf(idStr, "%d", products[i]->id);
-        fiobj_hash_set(product_hash, fiobj_str_new("id", 2), fiobj_str_new(idStr, strlen(idStr)));
+        fiobj_hash_set(product_hash, fiobj_str_new("id", 2), fiobj_num_new(products[i]->id));
         fiobj_ary_push(products_ary, product_hash);
     }
 
@@ -34,21 +32,52 @@ void products_controller_index(http_s* request) {
     free(products);
 }
 
+void private_render_products_show(http_s* request, Product* p) {
+    FIOBJ data = fiobj_hash_new();
+    fiobj_hash_set(data, fiobj_str_new("name", 4), fiobj_str_new(p->name, strlen(p->name)));
+    fiobj_hash_set(data, fiobj_str_new("id", 2), fiobj_num_new(p->id));
+    render(request, "products/show", data);
+    fiobj_free(data);
+    return ;
+}
+
 void products_controller_show(http_s* request) {
     FIOBJ id_obj = fiobj_hash_get(request->params, fiobj_str_new("id", 2));
     if (!id_obj) {
         http_send_error(request, 404);
         return;
     }
-    int product_id = (int)fiobj_obj2num(id_obj);
-    Product* p = product_find(product_id);
-    if (p) {
-        FIOBJ data = fiobj_hash_new();
-        fiobj_hash_set(data, fiobj_str_new("product_name", 12), fiobj_str_new(p->name, strlen(p->name)));
-        render(request, "products/show", data);
-        fiobj_free(data);
-        product_free(p);
-    } else {
+    Product* p = product_find((int)fiobj_obj2num(id_obj));
+    if (!p) {
         http_send_error(request, 404);
+        return;
     }
+    private_render_products_show(request, p);
+    product_free(p);
+}
+
+void products_controller_new(http_s* request){
+    FIOBJ data = fiobj_hash_new();
+    render(request, "products/new", data);
+    fiobj_free(data);
+}
+
+void products_controller_create(http_s* request) {
+    if (!request->body) {
+        http_send_error(request, 400);
+        return;
+    }
+
+    fio_str_info_s body = fiobj_data_gets(request->body);
+    strtok(body.data, "=\n"); // consumes the "name" form key
+    char* product_name = strtok(NULL, "=\n"); // gents the value of the name form key 
+
+    Product* p = product_new();
+    p->name = product_name;
+    
+    int id = product_save(p);
+    printf("Created and saved new product with id: %d\n", id);
+    
+    private_render_products_show(request, p);
+    product_free(p);
 }

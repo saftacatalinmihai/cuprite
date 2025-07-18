@@ -5,5 +5,7 @@
 
 void products_controller_show(http_s* request);
 void products_controller_index(http_s* request);
+void products_controller_new(http_s* request);
+void products_controller_create(http_s* request);
 
 #endif

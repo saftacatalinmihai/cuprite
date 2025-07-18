@@ -24,7 +24,7 @@ int product_save(Product* m) {
         const char* sql = "INSERT INTO products (name) VALUES (?)";
         sqlite3_stmt* stmt = db_prepare(sql);
         if (stmt) {
-             db_bind_text(stmt, 1, m->name);
+            db_bind_text(stmt, 1, m->name);
             db_step(stmt);
             m->id = sqlite3_last_insert_rowid(db_handle());
             db_finalize(stmt);
