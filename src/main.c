@@ -2,33 +2,29 @@
 #include "http.h" /* the HTTP facil.io extension */
 #include "db/db.h"
 #include "router.h"
-#include "controllers/application_controller.h"
+#include "application_controller.h"
 #include "fiobj.h"
 #include "models/generated/product.h"
 #include <stdio.h>
 
-void on_request(http_s *request)
-{
+void on_request(http_s *request) {
   route_request(request);
 }
 
-void on_thread_exit(void *arg)
-{
+void on_thread_exit(void *arg) {
   db_thread_close();
 }
 
 // Listen to HTTP requests and start facil.io
-int main(void)
-{
+int main(void) {
   db_init_with_filename("cuprite.db");
   // db_migrate();
   initialize_routes();
   template_hash = fiobj_hash_new();
 
   // SEED a test product so product_find(1) works
-  if (!product_find(1))
-  {
-    for (size_t i = 0; i < 1000; ++i)
+  if (!product_find(1)) {
+    for (size_t i = 0; i < 100; ++i)
     {
       Product *p_seed = product_new();
       char buffer[2000];

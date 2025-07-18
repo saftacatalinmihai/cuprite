@@ -239,7 +239,7 @@ def generate_model(name)
   plural = singular + 's'
   klass = name.capitalize
 
-  header_path = "src/models/#{singular}.h"
+  header_path = "app/models/#{singular}.h"
   unless File.exist?(header_path)
     puts "Error: #{header_path} not found."
     exit 1
@@ -252,7 +252,7 @@ def generate_model(name)
     exit 1
   end
 
-  FileUtils.mkdir_p("src/models/generated")
+  FileUtils.mkdir_p("app/models/generated")
 
   generate_migration(plural, fields)
 
@@ -274,7 +274,7 @@ void #{singular}_destroy(int id);
 
   c_file = <<-HEREDOC
 #include "#{singular}.h"
-#include "../../db/db.h"
+#include "db/db.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -296,8 +296,8 @@ void #{singular}_destroy(int id) {
 }
   HEREDOC
 
-  File.write("src/models/generated/#{singular}.h", h_file)
-  File.write("src/models/generated/#{singular}.c", c_file)
+  File.write("app/models/generated/#{singular}.h", h_file)
+  File.write("app/models/generated/#{singular}.c", c_file)
 end
 
 if ARGV.empty?

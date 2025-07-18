@@ -9,3 +9,4 @@ db/migrations/*
 *.pl
 *.awk
 .DS_Store
+app/models/generated/*
