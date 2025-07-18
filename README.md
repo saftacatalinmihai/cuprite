@@ -33,7 +33,13 @@ This will update your database schema to match the latest model definitions.
 To start the Cuprite web server, run the following command:
 
 ```bash
-./bin/cuprite
+./run_cuprite.sh
+```
+
+Alternatively, you can run the binary directly with the proper library path:
+
+```bash
+LD_LIBRARY_PATH=lib/facil.io/tmp:$LD_LIBRARY_PATH ./bin/cuprite
 ```
 
 The server will start and listen for requests on port 3001.
