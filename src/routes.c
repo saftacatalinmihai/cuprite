@@ -12,4 +12,6 @@ void initialize_routes(void) {
     route_get("/products/:id/edit", products_edit);
     route_patch("/products/:id", products_update);
     route_put("/products/:id", products_update);
+
+    route_delete("/products/:id", products_destroy);
 }
