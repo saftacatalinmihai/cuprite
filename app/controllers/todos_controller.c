@@ -8,12 +8,24 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
-void private_render_todos_view(http_s* request, char* view, Todo* t) {
+FIOBJ private_todo_to_fiobj(Todo* t) {
     FIOBJ data = fiobj_hash_new();
     fiobj_hash_set(data, fiobj_str_new("text", 4), fiobj_str_new(t->text, strlen(t->text)));
     fiobj_hash_set(data, fiobj_str_new("id", 2), fiobj_num_new(t->id));
-    fiobj_hash_set(data, fiobj_str_new("completed", 9), fiobj_num_new(t->completed));
+    FIOBJ completed_bool; 
+    if (t->completed) {
+        completed_bool = fiobj_true();
+    } else {
+        completed_bool = fiobj_false();
+    }
+    fiobj_hash_set(data, fiobj_str_new("completed", 9), completed_bool);
+    return data;
+}
+
+void private_render_todos_view(http_s* request, char* view, Todo* t) {
+    FIOBJ data = private_todo_to_fiobj(t);
     render(request, view, data);
     fiobj_free(data);
     return ;
@@ -39,18 +51,8 @@ void todos_index(http_s* request) {
 
     FIOBJ todos_ary = fiobj_ary_new();
     for (int i = 0; i < count; i++) {
-        FIOBJ todo_hash = fiobj_hash_new();
-        fiobj_hash_set(todo_hash, fiobj_str_new("text", 4), fiobj_str_new(todos[i]->text, strlen(todos[i]->text)));
-        fiobj_hash_set(todo_hash, fiobj_str_new("id", 2), fiobj_num_new(todos[i]->id));
-
-        FIOBJ completed_bool; 
-        if (todos[i]->completed) {
-            completed_bool = fiobj_true();
-        } else {
-            completed_bool = fiobj_false();
-        }
-        fiobj_hash_set(todo_hash, fiobj_str_new("completed", 9), completed_bool);
-        fiobj_ary_push(todos_ary, todo_hash);
+        FIOBJ data = private_todo_to_fiobj(todos[i]);
+        fiobj_ary_push(todos_ary, data);
     }
 
     FIOBJ data = fiobj_hash_new();
@@ -96,7 +98,7 @@ void todos_create(http_s* request) {
     printf("Created and saved new todo with id: %d\n", id);
     
     private_render_todos_view(request, "todos/show", t);
-    // product_free(p); // THIS fails for some reason... don't know why.
+    // todo_free(t); // THIS fails for some reason... don't know why.
 }
 
 void todos_edit(http_s* request) {
@@ -105,10 +107,7 @@ void todos_edit(http_s* request) {
         return;
     }
 
-    FIOBJ data = fiobj_hash_new();
-    fiobj_hash_set(data, fiobj_str_new("text", 4), fiobj_str_new(t->text, strlen(t->text)));
-    fiobj_hash_set(data, fiobj_str_new("id", 2), fiobj_num_new(t->id));
-    fiobj_hash_set(data, fiobj_str_new("completed", 9), fiobj_num_new(t->completed));
+    FIOBJ data = private_todo_to_fiobj(t);
     render(request, "todos/edit", data);
     fiobj_free(data);
 }
@@ -119,16 +118,34 @@ void todos_update(http_s* request) {
     if (!t) {
         return;
     }
-    
-    fio_str_info_s body = fiobj_data_gets(request->body);
-    strtok(body.data, "=\n"); // consumes the "text" form key
-    char* todo_text = strtok(NULL, "=\n"); // gents the value of the text form key 
-    char* todo_completed = strtok(NULL, "=\n"); // gents the value of the completed form key 
 
-    t->text = todo_text;
-    t->completed = atoi(todo_completed);
+    fio_str_info_s body = fiobj_data_gets(request->body);
+    printf("body: %s\n", body.data);
+    if (!body.data) {
+        http_send_error(request, 400);
+        return;
+    }
+    char* key = strtok(body.data, "=\n");
+    while(key) {
+        if (strcmp(key, "completed") == 0) {
+            char* todo_completed = strtok(NULL, "=\n");
+            if (strcmp(todo_completed, "true") == 0) {
+                printf("Setting completed to true\n");
+                t->completed = true;
+            } else {
+                printf("Setting completed to false\n");
+                t->completed = false;
+            }
+        } 
+        if (strcmp(key, "text") == 0) {
+            char* todo_text = strtok(NULL, "=\n"); 
+            t->text = todo_text;
+        }
+        key = strtok(NULL, "=\n");
+    }
     todo_save(t);
-    private_render_todos_view(request, "todos/show", t);
+    private_render_todos_view(request, "todos/todo", t);
+    free(t);
     return;
 }
 

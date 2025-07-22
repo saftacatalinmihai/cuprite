@@ -1,0 +1,15 @@
+<li id="todo-{{id}}" {{#completed}}class="completed"{{/completed}}>
+    <div class="view">
+        <input 
+            class="toggle" 
+            type="checkbox" 
+            hx-vals='js:{completed: this.checked}' 
+            hx-patch="/todos/{{id}}" 
+            hx-target="#todo-{{id}}" 
+            hx-swap="outerHTML" 
+            {{#completed}}checked{{/completed}}>
+        <label>{{text}}</label>
+        <button class="destroy" hx-delete="/todos/{{id}}" hx-target="body"></button>
+    </div>
+    <input class="edit" value="Create a TodoMVC template">
+</li>
