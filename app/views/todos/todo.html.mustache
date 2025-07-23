@@ -9,7 +9,7 @@
             hx-swap="outerHTML" 
             {{#completed}}checked{{/completed}}>
         <label>{{text}}</label>
-        <button class="destroy" hx-delete="/todos/{{id}}" hx-target="body"></button>
+        <button class="destroy" hx-delete="/todos/{{id}}" hx-target="body" hx-swap="outerHTML"></button>
     </div>
     <input class="edit" value="Create a TodoMVC template">
 </li>

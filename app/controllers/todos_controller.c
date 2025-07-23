@@ -49,14 +49,22 @@ void todos_index(http_s* request) {
     int count = 0;
     Todo** todos = todo_all(&count);
 
+    size_t remaining_count = 0;
     FIOBJ todos_ary = fiobj_ary_new();
     for (int i = 0; i < count; i++) {
         FIOBJ data = private_todo_to_fiobj(todos[i]);
+        if (!todos[i]->completed) {
+            remaining_count++;
+        }
         fiobj_ary_push(todos_ary, data);
     }
 
     FIOBJ data = fiobj_hash_new();
     fiobj_hash_set(data, fiobj_str_new("todos", 5), todos_ary);
+    fiobj_hash_set(data, fiobj_str_new("remaining_count", 15), fiobj_num_new(remaining_count));
+
+    printf("Remaining count: %zu\n", remaining_count);
+    
     render(request, "todos/index", data);
     fiobj_free(data);
 
@@ -66,21 +74,6 @@ void todos_index(http_s* request) {
     free(todos);
 }
 
-void todos_show(http_s* request) {
-    Todo* t = find_todo_by_request_id(request);
-    if (!t) {
-        return;
-    }
-    private_render_todos_view(request, "todos/show", t);
-    todo_free(t);
-}
-
-void todos_new(http_s* request){
-    FIOBJ data = fiobj_hash_new();
-    render(request, "todos/new", data);
-    fiobj_free(data);
-}
-
 void todos_create(http_s* request) {
     if (!request->body) {
         http_send_error(request, 400);
@@ -88,30 +81,23 @@ void todos_create(http_s* request) {
     }
 
     fio_str_info_s body = fiobj_data_gets(request->body);
-    strtok(body.data, "=\n"); // consumes the "name" form key
-    char* todo_text = strtok(NULL, "=\n"); // gents the value of the name form key 
+    printf("body: %s\n", body.data);
+    if (!body.data) {
+        http_send_error(request, 400);
+        return;
+    }
+    strtok(body.data, "=\n"); // consume the text key
+    char* todo_text = strtok(NULL, "=\n");
 
     Todo* t = todo_new();
     t->text = todo_text;
-    
+    t->completed = false;
     int id = todo_save(t);
     printf("Created and saved new todo with id: %d\n", id);
-    
-    private_render_todos_view(request, "todos/show", t);
-    // todo_free(t); // THIS fails for some reason... don't know why.
+    // todo_free(t); // THIS fails for some reason... don't know why. Maybe because the todo_text is on the stack, not malloc-ed.
+
+    todos_index(request);
 }
-
-void todos_edit(http_s* request) {
-    Todo* t = find_todo_by_request_id(request);
-    if (!t) {
-        return;
-    }
-
-    FIOBJ data = private_todo_to_fiobj(t);
-    render(request, "todos/edit", data);
-    fiobj_free(data);
-}
-
 
 void todos_update(http_s* request) {
     Todo* t = find_todo_by_request_id(request);
