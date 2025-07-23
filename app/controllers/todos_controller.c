@@ -146,3 +146,9 @@ void todos_destroy(http_s* request) {
     todos_index(request);
     return ;
 }
+
+void todos_mark_all_complete(http_s* request) {
+    todo_mark_all_complete();
+    todos_index(request);
+    return ;
+}

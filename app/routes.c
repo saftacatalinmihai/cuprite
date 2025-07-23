@@ -22,6 +22,7 @@ void initialize_routes(void) {
 
     route_post("/todos", todos_create);
 
+    route_patch("/todos", todos_mark_all_complete);
     route_patch("/todos/:id", todos_update);
     route_put("/todos/:id", todos_update);
 
