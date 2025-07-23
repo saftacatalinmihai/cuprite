@@ -26,4 +26,6 @@ void initialize_routes(void) {
     route_put("/todos/:id", todos_update);
 
     route_delete("/todos/:id", todos_destroy);
+    
+    route_delete("/todos/clear_completed", todos_clear_completed);
 }
