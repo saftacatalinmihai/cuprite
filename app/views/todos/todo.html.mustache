@@ -8,8 +8,12 @@
             hx-target="#todo-{{id}}" 
             hx-swap="outerHTML" 
             {{#completed}}checked{{/completed}}>
-        <label>{{text}}</label>
+        <label ondblclick="enterEditMode(this)">{{text}}</label>
         <button class="destroy" hx-delete="/todos/{{id}}" hx-target="body" hx-swap="outerHTML"></button>
     </div>
-    <input class="edit" value="Create a TodoMVC template">
+    <input 
+        class="edit" 
+        value="{{text}}"
+        onkeydown="handleEditKeydown(event, this)"
+        onblur="exitEditMode(this)">
 </li>

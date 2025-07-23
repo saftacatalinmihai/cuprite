@@ -9,6 +9,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <ctype.h>
+
+// URL decode function
+void url_decode(char* dst, const char* src) {
+    char a, b;
+    while (*src) {
+        if ((*src == '%') &&
+            ((a = src[1]) && (b = src[2])) &&
+            (isxdigit(a) && isxdigit(b))) {
+            if (a >= 'a')
+                a -= 'a' - 'A';
+            if (a >= 'A')
+                a -= ('A' - 10);
+            else
+                a -= '0';
+            if (b >= 'a')
+                b -= 'a' - 'A';
+            if (b >= 'A')
+                b -= ('A' - 10);
+            else
+                b -= '0';
+            *dst++ = 16 * a + b;
+            src += 3;
+        } else if (*src == '+') {
+            *dst++ = ' ';
+            src++;
+        } else {
+            *dst++ = *src++;
+        }
+    }
+    *dst = '\0';
+}
 
 FIOBJ private_todo_to_fiobj(Todo* t) {
     FIOBJ data = fiobj_hash_new();
@@ -124,8 +156,11 @@ void todos_update(http_s* request) {
             }
         } 
         if (strcmp(key, "text") == 0) {
-            char* todo_text = strtok(NULL, "=\n"); 
-            t->text = todo_text;
+            char* todo_text = strtok(NULL, "=\n");
+            // URL decode the text
+            char* decoded_text = malloc(strlen(todo_text) + 1);
+            url_decode(decoded_text, todo_text);
+            t->text = decoded_text;
         }
         key = strtok(NULL, "=\n");
     }

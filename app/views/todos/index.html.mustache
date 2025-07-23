@@ -40,6 +40,59 @@
 					$(".todo-list").addEventListener("change", () => {
 						$("#todo-count").innerHTML = $$('.todo-list input[type="checkbox"]:not(:checked)').length;
 					})
+
+					// Todo editing functionality
+					function enterEditMode(label) {
+						const li = label.closest('li');
+						const editInput = li.querySelector('.edit');
+						
+						li.classList.add('editing');
+						editInput.focus();
+						editInput.select();
+						
+						// Store original value for cancel functionality
+						editInput.dataset.originalValue = editInput.value;
+					}
+
+					function exitEditMode(input, shouldSave = true) {
+						const li = input.closest('li');
+						
+						if (shouldSave && input.value.trim() !== '' && input.value !== input.dataset.originalValue) {
+							// Trigger HTMX update by creating a manual HTMX request
+							const id = li.id.replace('todo-', '');
+							fetch(`/todos/${id}`, {
+								method: 'PATCH',
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded',
+									'HX-Request': 'true'
+								},
+								body: `text=${encodeURIComponent(input.value)}`
+							}).then(response => response.text())
+							.then(html => {
+								// Find the parent and replace the element
+								const parent = li.parentNode;
+								const newLi = document.createElement('li');
+								newLi.innerHTML = html;
+								parent.replaceChild(newLi.firstElementChild, li);
+							});
+						} else if (!shouldSave) {
+							// Restore original value
+							input.value = input.dataset.originalValue;
+							li.classList.remove('editing');
+						} else {
+							li.classList.remove('editing');
+						}
+					}
+
+					function handleEditKeydown(event, input) {
+						if (event.key === 'Enter') {
+							event.preventDefault();
+							exitEditMode(input, true);
+						} else if (event.key === 'Escape') {
+							event.preventDefault();
+							exitEditMode(input, false);
+						}
+					}
 				</script>
 				<!-- Remove this if you don't implement routing -->
 				<ul class="filters">
