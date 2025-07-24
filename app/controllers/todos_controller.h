@@ -8,5 +8,7 @@ void todos_create(http_s* request);
 void todos_update(http_s* request);
 void todos_destroy(http_s* request);
 void todos_mark_all_complete(http_s* request);
+void todos_clear_completed(http_s* request);
+
 
 #endif
