@@ -150,7 +150,7 @@ void route_request(http_s* request) {
 
     // Check for public files
     if (strcmp(method_info.data, "GET") == 0) {
-        char* public_file_path_in_folder[128];
+        char public_file_path_in_folder[128];
         sprintf(public_file_path_in_folder, "public/%s", path_info.data + 1);
         if (send_file(request, public_file_path_in_folder)) { return; }
     }

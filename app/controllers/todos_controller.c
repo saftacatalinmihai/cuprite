@@ -146,3 +146,21 @@ void todos_destroy(http_s* request) {
     todos_index(request);
     return ;
 }
+
+void todos_clear_completed(http_s* request) {
+    int count = 0;
+    Todo** todos = todo_all(&count);
+    
+    // Delete all completed todos
+    for (int i = 0; i < count; i++) {
+        if (todos[i]->completed) {
+            todo_destroy(todos[i]->id);
+        }
+        todo_free(todos[i]);
+    }
+    free(todos);
+    
+    // Render the updated todos index
+    todos_index(request);
+    return;
+}

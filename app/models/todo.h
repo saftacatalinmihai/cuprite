@@ -4,7 +4,7 @@
 typedef struct {
     int id;
     char* text;
-    int completed; // boolean: 0 false, 1 true;
+    int completed;
 } Todo;
 
 #endif
