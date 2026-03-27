@@ -1,0 +1,7 @@
+obj/*
+lib/*
+bin/*
+*.db
+*.db*
+db/migrations/*
+*.log
