@@ -59,4 +59,9 @@ generate_model:
 
 clean:
 	rm -rf $(BINDIR)
+	rm -rf $(APP_DIR)/models/generated/
 	rm -rf $(FACIL_IO_DIR)
+	rm -rf cuprite.db
+
+quickstart:
+	@make; make generate_model model=todo; make generate_model model=product; make migrate; make run

@@ -4,6 +4,9 @@ Cuprite is an experimental web framework written in C, leveraging the high-perfo
 
 ## Usage
 
+Quick start: `make quickstart` - this runs all the make targets bellow in order and starts the app on localhost:3001.
+There are 2 demo apps: localhost:3001/products and localhost:3001/todos
+
 To generate a new model, run the following command:
 
 ```bash
