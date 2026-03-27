@@ -3,11 +3,11 @@
 
 int main(void) {
     printf("Connecting to database...\n");
-    db_init("cuprite.db");
+    db_init_with_filename("cuprite.db");
     printf("Running migrations...\n");
     db_migrate();
     printf("Closing database connection...\n");
-    db_close();
+    db_thread_close();
     printf("Migrations complete.\n");
     return 0;
 }

@@ -5,19 +5,18 @@
 #include <dirent.h>
 #include <string.h>
 
-static sqlite3* db = NULL;
+static _Thread_local sqlite3 *db = NULL;
+static const char *db_name_g = NULL;
 
-void db_init(const char* db_name) {
-    if (sqlite3_open(db_name, &db)) {
-        fprintf(stderr, "Can't open database: %s\\n", sqlite3_errmsg(db));
-        db_close();
-        exit(1);
+void db_init_with_filename(const char* db_name) {
+    db_name_g = db_name;
+}
+
+void db_thread_close(void) {
+    if (db) {
+        sqlite3_close(db);
+        db = NULL;
     }
-    char *errMsg = 0;
-
-    sqlite3_exec(db, "PRAGMA journal_mode=WAL;", NULL, NULL, &errMsg);
-    sqlite3_exec(db, "PRAGMA synchronous=OFF;", NULL, NULL, &errMsg);
-    printf("Errors: %s\n", errMsg);
 }
 
 void db_migrate(void) {
@@ -75,16 +74,9 @@ void db_migrate(void) {
 }
 
 
-void db_close(void) {
-    if (db) {
-        sqlite3_close(db);
-        db = NULL;
-    }
-}
-
 int db_exec(const char* sql) {
     char* err_msg = 0;
-    int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    int rc = sqlite3_exec(db_handle(), sql, 0, 0, &err_msg);
     if (rc != SQLITE_OK) {
         fprintf(stderr, "SQL error: %s\n", err_msg);
         sqlite3_free(err_msg);
@@ -94,13 +86,23 @@ int db_exec(const char* sql) {
 }
 
 sqlite3* db_handle(void) {
+    if (db == NULL) {
+        if (sqlite3_open(db_name_g, &db)) {
+            fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+            db_thread_close();
+            exit(1);
+        }
+        char *errMsg = 0;
+        sqlite3_exec(db, "PRAGMA journal_mode=WAL;", NULL, NULL, &errMsg);
+        sqlite3_exec(db, "PRAGMA synchronous=OFF;", NULL, NULL, &errMsg);
+    }
     return db;
 }
 
 sqlite3_stmt* db_prepare(const char* sql) {
     sqlite3_stmt* stmt;
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, 0) != SQLITE_OK) {
-        fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
+    if (sqlite3_prepare_v2(db_handle(), sql, -1, &stmt, 0) != SQLITE_OK) {
+        fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db_handle()));
         return NULL;
     }
     return stmt;

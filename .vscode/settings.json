@@ -8,6 +8,8 @@
         "stdio.h": "c",
         "application_controller.h": "c",
         "fiobj.h": "c",
-        "__locale": "c"
+        "__locale": "c",
+        "fio.h": "c",
+        "stdlib.h": "c"
     }
 }

@@ -3,9 +3,9 @@
 
 #include <sqlite3.h>
 
-void db_init(const char* db_name);
+void db_init_with_filename(const char* db_name);
 void db_migrate(void);
-void db_close(void);
+void db_thread_close(void);
 int db_exec(const char* sql);
 sqlite3* db_handle(void);
 sqlite3_stmt* db_prepare(const char* sql);

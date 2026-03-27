@@ -5,3 +5,6 @@ bin/*
 *.db*
 db/migrations/*
 *.log
+*.perf
+*.pl
+*.awk
