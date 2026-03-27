@@ -8,6 +8,7 @@
         <input 
             class="toggle" 
             type="checkbox" 
+            hx-trigger="change"
             hx-vals='js:{completed: this.checked}' 
             hx-patch="/todos/{{id}}" 
             hx-target="#todo-{{id}}" 

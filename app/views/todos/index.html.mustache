@@ -21,7 +21,18 @@
 			</header>
 			<!-- This section should be hidden by default and shown when there are todos -->
 			<section class="main">
-				<input id="toggle-all" class="toggle-all" type="checkbox">
+				<script>
+					function toggleAll(event) {
+						$$('.todo-list input[type=checkbox]').forEach(todo_checkbox => { 
+							if (todo_checkbox.checked != event.target.checked) {
+								todo_checkbox.checked = event.target.checked; 
+								todo_checkbox.dispatchEvent(new Event('change')); // This will trigger the hx-patch request
+								$(".todo-list").dispatchEvent(new Event('change')); // This will update the todo count
+							}
+						});
+					}
+				</script>
+				<input id="toggle-all" class="toggle-all" type="checkbox" onClick="toggleAll(event)">
 				<label for="toggle-all">Mark all as complete</label>
 				<ul class="todo-list">
 					<!-- These are here just to show the structure of the list items -->
