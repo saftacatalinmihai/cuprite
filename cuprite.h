@@ -398,7 +398,6 @@ void render(http_s *request, char *view, FIOBJ data) {
   FIOBJ yield_str = fiobj_str_new("yield", 5);
   fiobj_hash_set(data, yield_str,
                  fiobj_str_new(view_content_str.data, view_content_str.len));
-
   FIOBJ response_body = fiobj_mustache_build(layout_template, data);
   free(layout_template);
   fiobj_free(view_content_obj);

@@ -11,3 +11,7 @@ db/migrations/*
 .DS_Store
 app/models/generated/*
 public/*
+scripts/flamegraph*
+out*
+*.out
+*.data

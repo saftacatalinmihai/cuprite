@@ -15,7 +15,7 @@ EXECUTABLE = $(BINDIR)/cuprite
 # -Wall -Wextra \
 
 CFLAGS = \
-	-g \
+	-pg \
 	-std=c11 \
 	-I. \
 	-I$(APP_DIR) \
