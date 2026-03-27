@@ -17,6 +17,11 @@
         "typeinfo": "c",
         "sstream": "c",
         "__node_handle": "c",
-        "http.h": "c"
+        "http.h": "c",
+        "stat.h": "c",
+        "array": "c",
+        "string": "c",
+        "string_view": "c",
+        "vector": "c"
     }
 }

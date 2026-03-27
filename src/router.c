@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <sys/stat.h>   // stat
+#include <stdbool.h>    // bool type
+
 
 #define MAX_ROUTES 100
 
@@ -60,12 +63,37 @@ void route_delete(char* path, controller_action action) {
     }
 }
 
+bool file_exists (char *filename) {
+  struct stat   buffer;   
+  return (stat (filename, &buffer) == 0);
+}
+
+static char* load_public(char* path, long* fsize) {
+    FILE *f = fopen(path, "rb");
+    fseek(f, 0, SEEK_END);
+    *fsize = ftell(f);
+    fseek(f, 0, SEEK_SET);  /* same as rewind(f); */
+
+    char *string = malloc(*fsize + 1);
+    fread(string, *fsize, 1, f);
+    fclose(f);
+
+    string[*fsize] = 0;
+
+    // use the string, then ...
+    return string;
+}
+
 void route_request(http_s* request) {
     clock_t begin = clock();
 
     fio_str_info_s path_info = fiobj_obj2cstr(request->path);
     fio_str_info_s method_info = fiobj_obj2cstr(request->method);
 
+    printf("Route method: %s\n", method_info.data);
+    printf("Request path: %s\n", path_info.data);
+
+    // Check for routes defined in app/routes.c
     for (int i = 0; i < route_count; i++) {
         if (strcmp(method_info.data, routes[i].method) == 0) {
             char* route_path_template = routes[i].path;
@@ -73,9 +101,7 @@ void route_request(http_s* request) {
             char* param_value = NULL;
             int param_int = 0;
 
-            // printf("Route method: %s\n", method_info.data);
             // printf("Route path template: %s\n", route_path_template);
-            // printf("Request path: %s\n", request_path);
 
             if (strchr(route_path_template, ':')) {
                 char* param_start = strchr(route_path_template, ':');
@@ -131,6 +157,22 @@ void route_request(http_s* request) {
             }
         }
     }
+
+    // Check for public files
+    if (strcmp(method_info.data, "GET") == 0) {
+        char* public_file_path = strtok(path_info.data, "/");
+        char* public_file_path_in_folder[128];
+        sprintf(public_file_path_in_folder, "public/%s", public_file_path);
+        if (file_exists(public_file_path_in_folder)) {
+            long file_size = 0;
+            char* public_file_string = load_public(public_file_path_in_folder, &file_size);
+            http_set_header(request, HTTP_HEADER_CONTENT_TYPE, http_mimetype_find("html", 4));
+            http_send_body(request, public_file_string, (unsigned long)file_size);
+            free(public_file_string);
+            return;
+        }
+    }
+    
 
     http_send_error(request, 404);
 }
