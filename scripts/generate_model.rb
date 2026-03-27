@@ -261,6 +261,10 @@ def generate_model(name)
 #define #{klass.upcase}_GENERATED_H
 
 #include "../#{singular}.h"
+#include "cuprite.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 #{klass}* #{singular}_new(void);
 void #{singular}_free(#{klass}* m);
@@ -268,16 +272,6 @@ int #{singular}_save(#{klass}* m);
 #{klass}* #{singular}_find(int id);
 #{klass}** #{singular}_all(int* count);
 void #{singular}_destroy(int id);
-
-#endif
-  HEREDOC
-
-  c_file = <<-HEREDOC
-#include "#{singular}.h"
-#include "db/db.h"
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 
 #{generate_new_function(klass, singular, fields)}
 #{generate_free_function(klass, singular, fields)}
@@ -294,10 +288,10 @@ void #{singular}_destroy(int id) {
         db_finalize(stmt);
     }
 }
+#endif
   HEREDOC
 
   File.write("app/models/generated/#{singular}.h", h_file)
-  File.write("app/models/generated/#{singular}.c", c_file)
 end
 
 if ARGV.empty?

@@ -27,6 +27,15 @@
         "todo.h": "c",
         "stdbool.h": "c",
         "fiobj_mustache.h": "c",
-        "todos_controller.h": "c"
+        "todos_controller.h": "c",
+        "cuprite.h": "c",
+        "dirent.h": "c",
+        "fiobj_ary.h": "c",
+        "fiobj_data.h": "c",
+        "fiobj_json.h": "c",
+        "fiobj_numbers.h": "c",
+        "fiobject.h": "c",
+        "fiobj_hash.h": "c",
+        "routes.h": "c"
     }
 }

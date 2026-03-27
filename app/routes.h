@@ -1,4 +1,7 @@
-#include "router.h"
+#ifndef ROUTES_H
+#define ROUTES_H
+
+#include "cuprite.h"
 #include "controllers/products_controller.h"
 #include "controllers/todos_controller.h"
 
@@ -29,3 +32,5 @@ void initialize_routes(void) {
     
     route_delete("/todos", todos_clear_completed);
 }
+
+#endif // ROUTES_H
