@@ -250,6 +250,67 @@ FIOBJ template_hash;
 
 #define USE_TEMPLATE_HASH 0
 
+typedef struct {
+  char* key;
+  char* value;
+} KeyValuePair;
+
+typedef struct {
+  KeyValuePair* pairs;
+  size_t count;
+} KeyValuePairArray;
+
+KeyValuePairArray parse_body_form(http_s* request) {
+    KeyValuePairArray result = {NULL, 0};
+
+    if (!request->body) {
+        http_send_error(request, 400);
+        return result;
+    }
+
+    fio_str_info_s body = fiobj_data_gets(request->body);
+  
+    if (body.data == NULL || body.len == 0) {
+        return result; // Return empty array if body is empty
+    }
+
+    char* key = strtok(body.data, "=\n");
+    while (key != NULL) {
+        char* value = strtok(NULL, "=\n");
+        if (value != NULL) {
+            result.pairs = realloc(result.pairs, sizeof(KeyValuePair) * (result.count + 1));
+            result.pairs[result.count].key = strdup(key);
+            char* decoded_text = malloc(strlen(value) + 1);
+            url_decode(decoded_text, value);
+            result.pairs[result.count].value = strdup(decoded_text);
+            free(decoded_text);
+            result.count++;
+        }
+        key = strtok(NULL, "=\n");
+    }
+
+    return result;
+}
+
+void body_form_free(KeyValuePairArray* array) {
+    for (size_t i = 0; i < array->count; i++) {
+        free(array->pairs[i].key);
+        free(array->pairs[i].value);
+    }
+    free(array->pairs);
+    array->pairs = NULL;
+    array->count = 0;
+}
+
+char* get_value_from_kv_array(KeyValuePairArray* array, const char* key) {
+    for (size_t i = 0; i < array->count; i++) {
+        if (strcmp(array->pairs[i].key, key) == 0) {
+            return array->pairs[i].value;
+        }
+    }
+    return NULL; // Return NULL if key not found
+}
+
 void url_decode(char *dst, const char *src) {
   char a, b;
   while (*src) {

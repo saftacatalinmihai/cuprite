@@ -38,6 +38,13 @@
         "fiobj_hash.h": "c",
         "routes.h": "c",
         "__config": "c",
-        "locale": "c"
+        "locale": "c",
+        "bitset": "c",
+        "unordered_map": "c",
+        "__bit_reference": "c",
+        "deque": "c",
+        "limits": "c",
+        "optional": "c",
+        "ratio": "c"
     }
 }
