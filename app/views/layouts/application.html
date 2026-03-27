@@ -3,6 +3,11 @@
 <head>
     <title>Cuprite App</title>
     <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.6/dist/htmx.min.js"></script>
+    <script>
+        const $ = document.querySelector.bind(document);
+        const $$ = document.querySelectorAll.bind(document);
+        const w = document.write.bind(document);
+    </script>
 </head>
 <body>
     {{{yield}}}

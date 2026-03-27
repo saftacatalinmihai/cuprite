@@ -20,12 +20,8 @@ void initialize_routes(void) {
     // TODOS
     route_get("/todos", todos_index);
 
-    route_get("/todos/new", todos_new);
     route_post("/todos", todos_create);
 
-    route_get("/todos/:id", todos_show);
-
-    route_get("/todos/:id/edit", todos_edit);
     route_patch("/todos/:id", todos_update);
     route_put("/todos/:id", todos_update);
 

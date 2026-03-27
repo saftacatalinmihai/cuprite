@@ -25,7 +25,8 @@ static mustache_s* load_template(char* path) {
 
     fprintf(stderr, "Loading template: %s\n", path);
     mustache_s* template = fiobj_mustache_load((fio_str_info_s){.data = path, .len = strlen(path)});
-    
+    fprintf(stderr, "Loaded template: %s\n", path);
+
     #if USE_TEMPLATE_HASH
         if (template) {
             template_obj = fiobj_num_new((intptr_t)template);

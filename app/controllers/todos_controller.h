@@ -3,11 +3,8 @@
 
 #include "http.h"
 
-void todos_show(http_s* request);
 void todos_index(http_s* request);
-void todos_new(http_s* request);
 void todos_create(http_s* request);
-void todos_edit(http_s* request);
 void todos_update(http_s* request);
 void todos_destroy(http_s* request);
 
