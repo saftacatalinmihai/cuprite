@@ -6,7 +6,7 @@ LDFLAGS = -L$(FACIL_IO_DIR)/tmp -lfacil -lsqlite3 -lm -lc -lpthread
 SRCDIR = src
 BINDIR = bin
 
-SOURCES = $(shell find $(SRCDIR) -name '*.c')
+SOURCES = $(filter-out $(SRCDIR)/migrate.c, $(shell find $(SRCDIR) -name '*.c'))
 EXECUTABLE = $(BINDIR)/cuprite
 
 all: download_facil_io $(FACIL_IO_DIR)/tmp/libfacil.a $(EXECUTABLE)

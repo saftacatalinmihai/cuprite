@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "product.h": "c",
+        "company.h": "c",
         "products_controller.h": "c",
         "router.h": "c",
         "sqlite3.h": "c",
@@ -12,6 +13,8 @@
         "fio.h": "c",
         "stdlib.h": "c",
         "string.h": "c",
-        "time.h": "c"
+        "time.h": "c",
+        "typeinfo": "c",
+        "sstream": "c"
     }
 }
