@@ -3,36 +3,38 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Template • TodoMVC</title>
+		<title>Cuprite • TodoMVC</title>
 		<link rel="stylesheet" href="css/index.css">
 	</head>
 	<body>
 		<section class="todoapp">
 			<header class="header">
 				<h1>todos</h1>
-				<input class="new-todo" 
-				hx-post="/todos" 
-				hx-vals='js:{text: this.value}' 
-            	hx-patch="/todos/{{id}}" 
-				hx-target="body" 
-            	hx-swap="outerHTML" 
-				placeholder="What needs to be done?" 
-				autofocus>
+				<input class="new-todo"
+					hx-on::before-request='this.value=""'
+					hx-post="/todos" 
+					hx-vals='js:{text: this.value}' 
+					hx-patch="/todos/{{id}}" 
+					hx-target=".todo-list" 
+					hx-swap="afterbegin" 
+					placeholder="What needs to be done?" 
+					autofocus>
 			</header>
 			<!-- This section should be hidden by default and shown when there are todos -->
 			<section class="main">
+				
 				<script>
 					function toggleAll(event) {
 						$$('.todo-list input[type=checkbox]').forEach(todo_checkbox => { 
 							if (todo_checkbox.checked != event.target.checked) {
 								todo_checkbox.checked = event.target.checked; 
-								todo_checkbox.dispatchEvent(new Event('change')); // This will trigger the hx-patch request
-								$(".todo-list").dispatchEvent(new Event('change')); // This will update the todo count
+								todo_checkbox.dispatchEvent(new Event('change')); // This will trigger the hx-patch request on the todo
 							}
 						});
 					}
 				</script>
 				<input id="toggle-all" class="toggle-all" type="checkbox" onClick="toggleAll(event)">
+
 				<label for="toggle-all">Mark all as complete</label>
 				<ul class="todo-list">
 					<!-- These are here just to show the structure of the list items -->
@@ -44,13 +46,12 @@
 			</section>
 			<!-- This footer should be hidden by default and shown when there are todos -->
 			<footer class="footer">
-				<span class="todo-count">{{> todo_count.html}} item left</span>
+				<span class="todo-count"><strong id="todo-count">{{remaining_count}}</strong> item left</span>
 				<script>
-					// This reacts to the checkbox check or uncheck event which does not reload the whole page.
-					// When we delete an entire todo or add a new one, the whole page is reloaded, and the template gives the remaining_count from the backend.
-					$(".todo-list").addEventListener("change", () => {
-						$("#todo-count").innerHTML = $$('.todo-list input[type="checkbox"]:not(:checked)').length;
-					})
+					function updateTodoCount() { 
+						$("#todo-count").innerHTML = $$('.todo-list input[type="checkbox"]:not(:checked)').length 
+					}
+					new MutationObserver(updateTodoCount).observe( $('.todo-list'), { childList: true, subtree: true, attributes: true } );
 				</script>
 				<!-- Remove this if you don't implement routing -->
 				<ul class="filters">
@@ -60,12 +61,8 @@
 							$("#filter-" + filter).classList.add("selected")
 							$$('.todo-list > li').forEach(todo => {
 								todo.hidden = false;
-								if (filter == "active" && todo.className == "completed") {
-									todo.hidden = true;
-								}
-								if (filter == "completed" && todo.className != "completed") {
-									todo.hidden = true;
-								}
+								if (filter == "active" && todo.className == "completed") { todo.hidden = true }
+								if (filter == "completed" && todo.className != "completed") { todo.hidden = true }
 							})
 						}
 					</script>

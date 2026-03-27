@@ -51,7 +51,7 @@ void todos_index(http_s* request) {
 
     size_t remaining_count = 0;
     FIOBJ todos_ary = fiobj_ary_new();
-    for (int i = 0; i < count; i++) {
+    for (int i = count-1; i >= 0; i--) {
         FIOBJ data = private_todo_to_fiobj(todos[i]);
         if (!todos[i]->completed) {
             remaining_count++;
@@ -96,9 +96,8 @@ void todos_create(http_s* request) {
     t->completed = false;
     int id = todo_save(t);
     printf("Created and saved new todo with id: %d\n", id);
+    private_render_todos_view(request, "todos/todo", t);
     todo_free(t);
-
-    todos_index(request);
 }
 
 void todos_update(http_s* request) {
@@ -147,18 +146,7 @@ void todos_destroy(http_s* request) {
     }
     int id = (int)fiobj_obj2num(id_obj);
     todo_destroy(id);
-
-    int count = 0;
-    Todo** todos = todo_all(&count);
-    size_t remaining_count = 0;
-    for (int i = 0; i < count; i++) {
-        if (!todos[i]->completed) {
-            remaining_count++;
-        }
-    }
-    FIOBJ data = fiobj_hash_new();
-    fiobj_hash_set(data, fiobj_str_new("remaining_count", 15), fiobj_num_new(remaining_count));
-    render(request, "todos/todo_count", data);
+    http_send_body(request, NULL, 0);
     return ;
 }
 
