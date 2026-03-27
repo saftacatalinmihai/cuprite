@@ -40,4 +40,8 @@ debug:
 start-debug: debug
 	gdb $(EXECUTABLE)
 
-.PHONY: all clean test debug start-debug
+migrate:
+	@mkdir -p $(BINDIR)
+	$(CC) $(CFLAGS) -o $(BINDIR)/migrate src/migrate.c src/db/db.c $(LDFLAGS)
+
+.PHONY: all clean test debug start-debug migrate
