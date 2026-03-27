@@ -15,7 +15,7 @@
             hx-swap="outerHTML" 
             {{#completed}}checked{{/completed}}>
         <label onClick="enableEditing{{id}}()">{{text}}</label>
-        <button class="destroy" hx-delete="/todos/{{id}}" hx-target="body" hx-swap="outerHTML"></button>
+        <button class="destroy" hx-delete="/todos/{{id}}" hx-target="#todo-{{id}}" hx-swap="outerHTML" ></button>
     </div>
     <input class="edit" value="{{text}}" 
         hx-trigger="focusout, keydown[key=='Enter']"

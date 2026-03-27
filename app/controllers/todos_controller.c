@@ -147,7 +147,18 @@ void todos_destroy(http_s* request) {
     }
     int id = (int)fiobj_obj2num(id_obj);
     todo_destroy(id);
-    todos_index(request);
+
+    int count = 0;
+    Todo** todos = todo_all(&count);
+    size_t remaining_count = 0;
+    for (int i = 0; i < count; i++) {
+        if (!todos[i]->completed) {
+            remaining_count++;
+        }
+    }
+    FIOBJ data = fiobj_hash_new();
+    fiobj_hash_set(data, fiobj_str_new("remaining_count", 15), fiobj_num_new(remaining_count));
+    render(request, "todos/todo_count", data);
     return ;
 }
 
