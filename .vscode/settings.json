@@ -37,6 +37,7 @@
         "fiobject.h": "c",
         "fiobj_hash.h": "c",
         "routes.h": "c",
-        "__config": "c"
+        "__config": "c",
+        "locale": "c"
     }
 }

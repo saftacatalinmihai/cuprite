@@ -19,22 +19,8 @@ void todos_update(http_s* request);
 void todos_destroy(http_s* request);
 void todos_clear_completed(http_s* request);
 
-FIOBJ private_todo_to_fiobj(Todo* t) {
-    FIOBJ data = fiobj_hash_new();
-    fiobj_hash_set(data, fiobj_str_new("text", 4), fiobj_str_new(t->text, strlen(t->text)));
-    fiobj_hash_set(data, fiobj_str_new("id", 2), fiobj_num_new(t->id));
-    FIOBJ completed_bool; 
-    if (t->completed) {
-        completed_bool = fiobj_true();
-    } else {
-        completed_bool = fiobj_false();
-    }
-    fiobj_hash_set(data, fiobj_str_new("completed", 9), completed_bool);
-    return data;
-}
-
 void private_render_todos_view(http_s* request, char* view, Todo* t) {
-    FIOBJ data = private_todo_to_fiobj(t);
+    FIOBJ data = todo_to_fiobj(t);
     render(request, view, data);
     fiobj_free(data);
     return ;
@@ -57,26 +43,17 @@ Todo* find_todo_by_request_id(http_s* request) {
 void todos_index(http_s* request) {
     int count = 0;
     Todo** todos = todo_all(&count);
-
-    size_t remaining_count = 0;
-    FIOBJ todos_ary = fiobj_ary_new();
-    for (int i = count-1; i >= 0; i--) {
-        FIOBJ data = private_todo_to_fiobj(todos[i]);
-        if (!todos[i]->completed) {
-            remaining_count++;
-        }
-        fiobj_ary_push(todos_ary, data);
+    Todo** reversed = malloc(sizeof(Todo*) * count);
+    for (int i = 0; i < count; i++) {
+        reversed[i] = todos[count - 1 - i];
     }
+    free(todos);
+    todos = reversed;
+    FIOBJ data = todos_to_fiobj(todos, count);
 
-    FIOBJ data = fiobj_hash_new();
-    fiobj_hash_set(data, fiobj_str_new("todos", 5), todos_ary);
-    fiobj_hash_set(data, fiobj_str_new("remaining_count", 15), fiobj_num_new(remaining_count));
-
-    printf("Remaining count: %zu\n", remaining_count);
-    
     render(request, "todos/index", data);
-    fiobj_free(data);
 
+    fiobj_free(data);
     for (int i = 0; i < count; i++) {
         todo_free(todos[i]);
     }

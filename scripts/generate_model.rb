@@ -6,7 +6,8 @@ C_TO_SQL_TYPE_MAP = {
   'int' => 'INTEGER',
   'char*' => 'TEXT',
   'float' => 'REAL',
-  'double' => 'REAL'
+  'double' => 'REAL',
+  'bool' => 'INTEGER', # SQLite does not have a boolean type, using INTEGER instead
 }.freeze
 
 # Represents a field in a C struct.
@@ -60,6 +61,88 @@ def generate_migration(plural, fields)
   File.write(migration_file, sql)
   puts "Created migration: #{migration_file}"
 end
+# Generates the function to convert a model to a FIOBJ.
+# For instance, if the model is `Product`, it generates `product_to_fiobj`.
+# ````
+# typedef struct {
+#     int id;
+#     char* name;
+# } Product;
+# ```
+# Generates:
+# ```c
+# FIOBJ key_name;
+# FIOBJ key_id;
+# FIOBJ product_to_fiobj(Product p) {
+#     FIOBJ product_hash = fiobj_hash_new();
+#     if (!key_name) {
+#         key_name = fiobj_str_new("name", 4);
+#     }
+#     if (!key_id) {
+#         key_id = fiobj_str_new("id", 2);
+#     }
+#     fiobj_hash_set(product_hash, key_name, fiobj_str_new(p.name, strlen(p.name)));
+#     fiobj_hash_set(product_hash, key_id, fiobj_num_new(p.id));
+#     return product_hash;
+# }
+# ```
+def generate_to_fiobj_function(klass, singular, fields)
+  key_definitions = fields.map do |field|
+      "FIOBJ key_#{field.name};"
+  end.join("\n")
+
+  key_assignments = fields.map do |field|
+      "    if (!key_#{field.name}) {\n        key_#{field.name} = fiobj_str_new(\"#{field.name}\", #{field.name.length});\n    }"
+  end.join("\n")
+
+  assignments = fields.map do |field|
+    if field.type == 'char*'
+      "    fiobj_hash_set(model_hash, key_#{field.name}, fiobj_str_new(m->#{field.name}, strlen(m->#{field.name})));"
+    elsif field.type == 'bool'
+      <<-HEREDOC
+    FIOBJ #{field.name}_bool;
+    if (m->#{field.name}) {
+        #{field.name}_bool = fiobj_true();
+    } else {
+        #{field.name}_bool = fiobj_false();
+    }
+    fiobj_hash_set(model_hash, key_#{field.name}, #{field.name}_bool);    
+        HEREDOC
+    else
+      "    fiobj_hash_set(model_hash, key_#{field.name}, fiobj_num_new(m->#{field.name}));"
+    end
+  end.join("\n")
+
+  <<-HEREDOC
+#{key_definitions}
+
+FIOBJ #{singular}_to_fiobj(#{klass}* m) {
+    FIOBJ model_hash = fiobj_hash_new();
+#{key_assignments}
+#{assignments}
+    return model_hash;
+}
+  HEREDOC
+end
+
+def generate_list_to_fiobj_function(klass, singular, plural, fields)
+  <<-HEREDOC
+FIOBJ key_#{plural};
+FIOBJ #{singular}s_to_fiobj(#{klass}** models, int count) {
+    FIOBJ models_ary = fiobj_ary_new();
+    if (!key_#{plural}) {
+        key_#{plural} = fiobj_str_new("#{plural}", #{plural.length});
+    }
+    for (int i = 0; i < count; i++) {
+        FIOBJ model_hash = #{singular}_to_fiobj(models[i]);
+        fiobj_ary_push(models_ary, model_hash);
+    }
+    FIOBJ result = fiobj_hash_new();
+    fiobj_hash_set(result, key_#{plural}, models_ary);
+    return result;
+}
+  HEREDOC
+end
 
 def generate_new_function(klass, singular, fields)
   initializers = fields.map do |field|
@@ -104,6 +187,8 @@ def generate_save_function(klass, singular, plural, fields)
       "             db_bind_text(stmt, #{i + 1}, m->#{field.name});"
     elsif field.type == 'int'
       "             db_bind_int(stmt, #{i + 1}, m->#{field.name});"
+    elsif field.type == 'bool'
+      "             db_bind_int(stmt, #{i + 1}, m->#{field.name});"
     end
   end.join("\n")
 
@@ -112,6 +197,8 @@ def generate_save_function(klass, singular, plural, fields)
     if field.type == 'char*'
       "             db_bind_text(stmt, #{i + 1}, m->#{field.name});"
     elsif field.type == 'int'
+      "             db_bind_int(stmt, #{i + 1}, m->#{field.name});"
+    elsif field.type == 'bool'
       "             db_bind_int(stmt, #{i + 1}, m->#{field.name});"
     end
   end.join("\n")
@@ -273,6 +360,8 @@ int #{singular}_save(#{klass}* m);
 #{klass}** #{singular}_all(int* count);
 void #{singular}_destroy(int id);
 
+#{generate_to_fiobj_function(klass, singular, fields)}
+#{generate_list_to_fiobj_function(klass, singular, plural, fields)}
 #{generate_new_function(klass, singular, fields)}
 #{generate_free_function(klass, singular, fields)}
 #{generate_save_function(klass, singular, plural, fields)}

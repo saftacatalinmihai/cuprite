@@ -4,7 +4,7 @@ FACIL_IO_DIR = lib/facil.io
 
 CUPRITE_H = cuprite.h
 APP_DIR = app
-APP_SOURCES = $(shell find $(APP_DIR) -type f -name '*.c')
+APP_SOURCES = $(shell find $(APP_DIR) -type f -name '*.c' -o -name '*.h')
 BINDIR = bin
 EXECUTABLE = $(BINDIR)/cuprite
 

@@ -1,10 +1,12 @@
 #ifndef TODO_H
 #define TODO_H
 
+#include "stdbool.h"
+
 typedef struct {
     int id;
     char* text;
-    int completed;
+    bool completed;
 } Todo;
 
 #endif
