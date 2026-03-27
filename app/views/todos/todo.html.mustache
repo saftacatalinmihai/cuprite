@@ -1,3 +1,8 @@
+<script>
+    function enableEditing{{id}}() {
+        $("#todo-{{id}}").classList.add("editing");
+    }
+</script>
 <li id="todo-{{id}}" {{#completed}}class="completed"{{/completed}}>
     <div class="view">
         <input 
@@ -8,8 +13,13 @@
             hx-target="#todo-{{id}}" 
             hx-swap="outerHTML" 
             {{#completed}}checked{{/completed}}>
-        <label>{{text}}</label>
+        <label onClick="enableEditing{{id}}()">{{text}}</label>
         <button class="destroy" hx-delete="/todos/{{id}}" hx-target="body" hx-swap="outerHTML"></button>
     </div>
-    <input class="edit" value="Create a TodoMVC template">
+    <input class="edit" value="{{text}}" 
+        hx-trigger="focusout, keydown[key=='Enter']"
+        hx-vals='js:{text: this.value}'
+        hx-patch="/todos/{{id}}" 
+        hx-target="#todo-{{id}}" 
+        hx-swap="outerHTML">
 </li>

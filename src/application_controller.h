@@ -6,6 +6,7 @@
 
 extern FIOBJ template_hash;
 
+void url_decode(char* dst, const char* src);
 void render(http_s* request, char* view, FIOBJ data);
 
 #endif

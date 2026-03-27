@@ -88,13 +88,15 @@ void todos_create(http_s* request) {
     }
     strtok(body.data, "=\n"); // consume the text key
     char* todo_text = strtok(NULL, "=\n");
+    char* decoded_text = malloc(strlen(todo_text) + 1);
+    url_decode(decoded_text, todo_text);
 
     Todo* t = todo_new();
-    t->text = todo_text;
+    t->text = decoded_text;
     t->completed = false;
     int id = todo_save(t);
     printf("Created and saved new todo with id: %d\n", id);
-    // todo_free(t); // THIS fails for some reason... don't know why. Maybe because the todo_text is on the stack, not malloc-ed.
+    todo_free(t);
 
     todos_index(request);
 }
@@ -125,13 +127,15 @@ void todos_update(http_s* request) {
         } 
         if (strcmp(key, "text") == 0) {
             char* todo_text = strtok(NULL, "=\n"); 
-            t->text = todo_text;
+            char* decoded_text = malloc(strlen(todo_text) + 1);
+            url_decode(decoded_text, todo_text);
+            t->text = decoded_text;
         }
         key = strtok(NULL, "=\n");
     }
     todo_save(t);
     private_render_todos_view(request, "todos/todo", t);
-    free(t);
+    todo_free(t);
     return;
 }
 
