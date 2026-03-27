@@ -1,6 +1,8 @@
 #ifndef CUPRITE_H
 #define CUPRITE_H
 
+#define _GNU_SOURCE
+
 #include <dirent.h>
 #include <sqlite3.h>
 #include <stdbool.h>

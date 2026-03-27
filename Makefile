@@ -1,4 +1,5 @@
 CC = gcc
+# CC = clang
 
 FACIL_IO_DIR = lib/facil.io
 
@@ -13,8 +14,9 @@ EXECUTABLE = $(BINDIR)/cuprite
 # 	-fsanitize=address \
 # 	-O0 \
 # 	-O3 \
+# -Wall -Wextra \
 
-CFLAGS = -Wall -Wextra \
+CFLAGS = \
 	-g \
 	-std=c11 \
 	-I. \
@@ -23,7 +25,7 @@ CFLAGS = -Wall -Wextra \
 	-I$(FACIL_IO_DIR)/lib/facil/http \
 	-I$(FACIL_IO_DIR)/lib/facil/fiobj \
 
-LDFLAGS = -L$(FACIL_IO_DIR)/tmp -lfacil -lsqlite3
+LDFLAGS = -L$(FACIL_IO_DIR)/tmp -Wl,-rpath=$(FACIL_IO_DIR)/tmp -lfacil -lsqlite3
 
 $(FACIL_IO_DIR)/tmp/libfacil.so:
 	@if [ ! -d "$(FACIL_IO_DIR)/.git" ]; then \
