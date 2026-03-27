@@ -1,5 +1,3 @@
-CC = gcc
-# CC = clang
 
 FACIL_IO_DIR = lib/facil.io
 
@@ -25,7 +23,14 @@ CFLAGS = \
 	-I$(FACIL_IO_DIR)/lib/facil/http \
 	-I$(FACIL_IO_DIR)/lib/facil/fiobj \
 
+MACHINE = $(shell uname -m)
+ifeq ($(MACHINE), arm64)
+CC = clang
+LDFLAGS = -L$(FACIL_IO_DIR)/tmp -lfacil -lsqlite3
+else
+CC = gcc
 LDFLAGS = -L$(FACIL_IO_DIR)/tmp -Wl,-rpath=$(FACIL_IO_DIR)/tmp -lfacil -lsqlite3
+endif
 
 $(FACIL_IO_DIR)/tmp/libfacil.so:
 	@if [ ! -d "$(FACIL_IO_DIR)/.git" ]; then \
@@ -64,4 +69,4 @@ clean:
 	rm -rf cuprite.db
 
 quickstart:
-	@make; make generate_model model=todo; make generate_model model=product; make migrate; make run
+	@make generate_model model=todo; make generate_model model=product; make migrate; make run
