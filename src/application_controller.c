@@ -40,10 +40,10 @@ static mustache_s* load_template(char* path) {
 
 void render(http_s* request, char* view, FIOBJ data) {
     char view_path[256];
-    snprintf(view_path, sizeof(view_path), "src/views/%s.html", view);
+    snprintf(view_path, sizeof(view_path), "app/views/%s.html", view);
 
     char layout_path[256];
-    snprintf(layout_path, sizeof(layout_path), "src/views/layouts/application.html");
+    snprintf(layout_path, sizeof(layout_path), "app/views/layouts/application.html");
 
     mustache_s* view_template = load_template(view_path);
     mustache_s* layout_template = load_template(layout_path);

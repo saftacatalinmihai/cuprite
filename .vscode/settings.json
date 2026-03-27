@@ -16,6 +16,7 @@
         "time.h": "c",
         "typeinfo": "c",
         "sstream": "c",
-        "__node_handle": "c"
+        "__node_handle": "c",
+        "http.h": "c"
     }
 }

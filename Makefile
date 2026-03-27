@@ -1,15 +1,16 @@
 CC = gcc
 FACIL_IO_DIR = lib/facil.io
-CFLAGS = -Iinclude -Isrc -I$(FACIL_IO_DIR)/lib/facil -I$(FACIL_IO_DIR)/lib/facil/http -I$(FACIL_IO_DIR)/lib/facil/cli -I$(FACIL_IO_DIR)/lib/facil/fiobj -Wall -Wextra -std=gnu11 -include errno.h -D_GNU_SOURCE
+CFLAGS = -Iinclude -Isrc -Iapp -I$(FACIL_IO_DIR)/lib/facil -I$(FACIL_IO_DIR)/lib/facil/http -I$(FACIL_IO_DIR)/lib/facil/cli -I$(FACIL_IO_DIR)/lib/facil/fiobj -Wall -Wextra -std=gnu11 -include errno.h -D_GNU_SOURCE
 LDFLAGS = -L$(FACIL_IO_DIR)/tmp -lfacil -lsqlite3 -lm -lc -lpthread
 
 SRCDIR = src
+APPDIR = app
 BINDIR = bin
-
-SOURCES = $(filter-out $(SRCDIR)/migrate.c, $(shell find $(SRCDIR) -name '*.c'))
 EXECUTABLE = $(BINDIR)/cuprite
 
-all: download_facil_io $(FACIL_IO_DIR)/tmp/libfacil.a $(EXECUTABLE)
+SOURCES = $(filter-out $(SRCDIR)/migrate.c, $(shell find $(SRCDIR) -name '*.c')) $(shell find $(APPDIR) -name '*.c')
+
+all: $(EXECUTABLE)
 
 download_facil_io:
 	@mkdir -p $(FACIL_IO_DIR)
@@ -19,10 +20,10 @@ download_facil_io:
 		echo "facil.io already cloned. Skipping."; \
 	fi
 
-$(FACIL_IO_DIR)/tmp/libfacil.a:
+$(FACIL_IO_DIR)/tmp/libfacil.a: download_facil_io
 	$(MAKE) -C $(FACIL_IO_DIR) lib
 
-$(EXECUTABLE): $(SOURCES)
+$(EXECUTABLE): $(SOURCES) $(FACIL_IO_DIR)/tmp/libfacil.a
 	@mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) -o $@ $(SOURCES) $(LDFLAGS)
 
@@ -31,7 +32,7 @@ clean:
 	$(MAKE) -C $(FACIL_IO_DIR) clean
 
 test:
-	$(CC) $(CFLAGS) -Isrc tests/product_model_test.c src/db/db.c src/models/generated/product.c -lsqlite3 -o bin/product_model_test && ./bin/product_model_test
+	$(CC) $(CFLAGS) -Isrc tests/product_model_test.c src/db/db.c app/models/generated/product.c $(LDFLAGS) -o bin/product_model_test && ./bin/product_model_test
 
 debug:
 	@$(MAKE) clean
@@ -43,5 +44,6 @@ start-debug: debug
 migrate:
 	@mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) -o $(BINDIR)/migrate src/migrate.c src/db/db.c $(LDFLAGS)
-
+	@$(BINDIR)/migrate
+	
 .PHONY: all clean test debug start-debug migrate

@@ -1,6 +1,6 @@
 #include "products_controller.h"
 #include "application_controller.h"
-#include "../models/generated/product.h"
+#include "models/generated/product.h"
 
 #include "http.h" /* the HTTP facil.io extension */
 #include "fiobj.h"
