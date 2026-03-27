@@ -8,7 +8,7 @@ APP_SOURCES = $(shell find $(APP_DIR) -type f -name '*.c')
 BINDIR = bin
 EXECUTABLE = $(BINDIR)/cuprite
 
-CFLAGS = -Wall -Wextra -std=c17 -I. \
+CFLAGS = -Wall -Wextra -std=c17 -g -I. \
 	-I$(APP_DIR) \
 	-I$(FACIL_IO_DIR)/lib/facil \
 	-I$(FACIL_IO_DIR)/lib/facil/http \
