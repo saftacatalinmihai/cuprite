@@ -8,3 +8,4 @@ db/migrations/*
 *.perf
 *.pl
 *.awk
+.DS_Store
