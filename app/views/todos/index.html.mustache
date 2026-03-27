@@ -43,23 +43,29 @@
 				</script>
 				<!-- Remove this if you don't implement routing -->
 				<ul class="filters">
+					<script>
+						function filterOnly(filter) {
+							$$('.filters a').forEach(e => e.classList.remove("selected"))
+							$("#filter-" + filter).classList.add("selected")
+							$$('.todo-list > li').forEach(todo => {
+								todo.hidden = false;
+								if (filter == "active" && todo.className == "completed") {
+									todo.hidden = true;
+								}
+								if (filter == "completed" && todo.className != "completed") {
+									todo.hidden = true;
+								}
+							})
+						}
+					</script>
 					<li>
-						<a class="selected" href="#/">All</a>
+						<a id="filter-all" href="#/" onClick='filterOnly("all")' class="selected">All</a>
 					</li>
 					<li>
-						<a href="#/active" onClick="filterOnlyActive()">Active</a>
-						{{! <script>
-							function filterOnlyActive() {
-								$$('.todo-list > li').forEach(e => 
-									if (e.className == "completed") {
-										e.hidden = true;
-									}
-								)
-							}
-						</script> }}
+						<a id="filter-active" href="#/active" onClick='filterOnly("active")'>Active</a>
 					</li>
 					<li>
-						<a href="#/completed">Completed</a>
+						<a id="filter-completed" href="#/completed" onClick='filterOnly("completed")'>Completed</a>
 					</li>
 				</ul>
 				<!-- Hidden if no completed items are left ↓ -->
