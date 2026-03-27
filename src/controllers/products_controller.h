@@ -3,9 +3,11 @@
 
 #include "http.h"
 
-void products_controller_show(http_s* request);
-void products_controller_index(http_s* request);
-void products_controller_new(http_s* request);
-void products_controller_create(http_s* request);
+void products_show(http_s* request);
+void products_index(http_s* request);
+void products_new(http_s* request);
+void products_create(http_s* request);
+void products_edit(http_s* request);
+void products_update(http_s* request);
 
 #endif

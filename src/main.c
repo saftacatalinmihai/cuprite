@@ -41,7 +41,7 @@ int main(void)
 
   fio_state_callback_add(FIO_CALL_ON_FINISH, on_thread_exit, NULL);
   http_listen("3001", NULL, .on_request = on_request, .log = 1);
-  fio_start();
-  // fio_start(.threads = 1);
+  // fio_start();
+  fio_start(.threads = 1);
   // fio_start(.threads = 32);
 }
