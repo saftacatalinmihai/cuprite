@@ -4,6 +4,6 @@
 
 <ul>
   {{#products}}
-    <li><a href="/products/{{id}}">{{name}}</a></li>
+    <li><button hx-delete="/products/{{id}}" hx-target="body">delete</button>&nbsp&nbsp&nbsp&nbsp&nbsp<a href="/products/{{id}}">{{name}}</a></li> 
   {{/products}}
 </ul>

@@ -120,3 +120,15 @@ void products_update(http_s* request) {
     private_render_products_view(request, "products/show", p);
     return;
 }
+
+void products_destroy(http_s* request) {
+    FIOBJ id_obj = fiobj_hash_get(request->params, fiobj_str_new("id", 2));
+    if (!id_obj) {
+        http_send_error(request, 404);
+        return ;
+    }
+    int product_id = (int)fiobj_obj2num(id_obj);
+    product_destroy(product_id);
+    products_index(request);
+    return ;
+}

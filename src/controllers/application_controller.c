@@ -9,25 +9,31 @@
 
 FIOBJ template_hash;
 
-static mustache_s* load_template(char* path) {
-    FIOBJ key = fiobj_str_new(path, strlen(path));
-    FIOBJ template_obj = fiobj_hash_get(template_hash, key);
+#define USE_TEMPLATE_HASH 0
 
-    if (template_obj) {
-        // fprintf(stderr, "Loading cached template: %s\n", path);
-        fiobj_free(key);
-        return (mustache_s*)(uintptr_t)fiobj_obj2num(template_obj);
-    }
+static mustache_s* load_template(char* path) {
+    #if USE_TEMPLATE_HASH
+        FIOBJ key = fiobj_str_new(path, strlen(path));
+        FIOBJ template_obj = fiobj_hash_get(template_hash, key);
+
+        if (template_obj) {
+            // fprintf(stderr, "Loading cached template: %s\n", path);
+            fiobj_free(key);
+            return (mustache_s*)(uintptr_t)fiobj_obj2num(template_obj);
+        }
+    #endif
 
     fprintf(stderr, "Loading template: %s\n", path);
     mustache_s* template = fiobj_mustache_load((fio_str_info_s){.data = path, .len = strlen(path)});
-
-    if (template) {
-        template_obj = fiobj_num_new((intptr_t)template);
-        fiobj_hash_set(template_hash, key, template_obj);
-    } else {
-        fiobj_free(key);
-    }
+    
+    #if USE_TEMPLATE_HASH
+        if (template) {
+            template_obj = fiobj_num_new((intptr_t)template);
+            fiobj_hash_set(template_hash, key, template_obj);
+        } else {
+            fiobj_free(key);
+        }
+    #endif
 
     return template;
 }

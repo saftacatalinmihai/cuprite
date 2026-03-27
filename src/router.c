@@ -51,6 +51,15 @@ void route_put(char* path, controller_action action) {
     }
 }
 
+void route_delete(char* path, controller_action action) {
+    if (route_count < MAX_ROUTES) {
+        routes[route_count].method = "DELETE";
+        routes[route_count].path = path;
+        routes[route_count].action = action;
+        route_count++;
+    }
+}
+
 void route_request(http_s* request) {
     clock_t begin = clock();
 
