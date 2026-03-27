@@ -10,6 +10,8 @@
         "fiobj.h": "c",
         "__locale": "c",
         "fio.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "string.h": "c",
+        "time.h": "c"
     }
 }

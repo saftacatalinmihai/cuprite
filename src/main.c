@@ -38,5 +38,5 @@ int main(void) {
     http_listen("3001", NULL, .on_request = on_request, .log = 1);
     fio_start();
     // fio_start(.threads = 1);
-    // fio_start(.threads = 8);
+    // fio_start(.threads = 32);
 }
