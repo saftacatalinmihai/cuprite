@@ -1,9 +1,12 @@
-<h1>Products</h1>
+<h1 style="view-transition-name: product-head;">Products</h1>
 
 <a href="/products/new">Create new product</a>
 
-<ul>
+<ul hx-ext="preload">
   {{#products}}
-    <li><button hx-delete="/products/{{id}}" hx-target="body">delete</button>&nbsp&nbsp&nbsp&nbsp&nbsp<a href="/products/{{id}}">{{name}}</a></li> 
+    <li>
+      <button hx-delete="/products/{{id}}" hx-target="body" style="view-transition-name:product-delete-{{id}};">delete</button>&nbsp&nbsp&nbsp&nbsp&nbsp
+      <a class="product-name" href="/products/{{id}}" preload="mouseover" style="view-transition-name:product-name-{{id}}; view-transition-class:product-name;">{{name}}</a>
+    </li> 
   {{/products}}
 </ul>

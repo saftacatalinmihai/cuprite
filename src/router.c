@@ -65,6 +65,9 @@ void route_delete(char* path, controller_action action) {
 bool send_file(http_s* request, char* path) {
     struct stat buffer;   
     if (stat(path, &buffer) == 0) {
+        if (S_ISDIR(buffer.st_mode) != 0) {
+            return false;
+        }
         int fd = open(path, O_RDONLY);
         http_sendfile(request, fd, buffer.st_size, 0);
         close(fd);
@@ -152,6 +155,11 @@ void route_request(http_s* request) {
     if (strcmp(method_info.data, "GET") == 0) {
         char public_file_path_in_folder[128];
         sprintf(public_file_path_in_folder, "public/%s", path_info.data + 1);
+        if (send_file(request, public_file_path_in_folder)) { return; }
+
+        // If no file found, check for index.html in the public folder directly - used for static site generation like hugo.
+        sprintf(public_file_path_in_folder, "public/%sindex.html", path_info.data + 1);
+        http_set_header(request, HTTP_HEADER_CONTENT_TYPE, http_mimetype_find((char *)"html", 4));
         if (send_file(request, public_file_path_in_folder)) { return; }
     }
 

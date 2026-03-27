@@ -1,6 +1,6 @@
 CC = gcc
 FACIL_IO_DIR = lib/facil.io
-CFLAGS = -Iinclude -Isrc -Iapp -I$(FACIL_IO_DIR)/lib/facil -I$(FACIL_IO_DIR)/lib/facil/http -I$(FACIL_IO_DIR)/lib/facil/cli -I$(FACIL_IO_DIR)/lib/facil/fiobj -Wall -Wextra -std=gnu11 -include errno.h -D_GNU_SOURCE
+CFLAGS = -Isrc -Iapp -I$(FACIL_IO_DIR)/lib/facil -I$(FACIL_IO_DIR)/lib/facil/http -I$(FACIL_IO_DIR)/lib/facil/cli -I$(FACIL_IO_DIR)/lib/facil/fiobj -Wall -Wextra -std=gnu11 -include errno.h -D_GNU_SOURCE
 LDFLAGS = -L$(FACIL_IO_DIR)/tmp -lfacil -lsqlite3 -lm -lc -lpthread
 
 SRCDIR = src

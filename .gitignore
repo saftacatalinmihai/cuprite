@@ -10,3 +10,4 @@ db/migrations/*
 *.awk
 .DS_Store
 app/models/generated/*
+public/*

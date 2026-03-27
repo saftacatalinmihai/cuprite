@@ -1,10 +1,10 @@
-<h1>Product</h1>
+<h1 style="view-transition-name: product-head;">Product</h1>
 <a href="/products">Products</a>
 <br/>
 <a href="/products/{{id}}/edit">Edit</a>
-<p>
-    <strong>Name:</strong> {{name}}
+<p class="product-name">
+    <strong>Name: </strong><span style="view-transition-name:product-name-{{id}}; view-transition-class:product-name;">{{name}}</span>
 </p>
 <p>ID: {{id}}</p>
 
-<button hx-delete="/products/{{id}}" hx-target="body">DELETE</button>
+<button hx-delete="/products/{{id}}" hx-target="body" style="view-transition-name:product-delete-{{id}};">DELETE</button>

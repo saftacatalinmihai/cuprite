@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.mustache": "mustache",
         "product.h": "c",
         "company.h": "c",
         "products_controller.h": "c",
@@ -24,6 +25,8 @@
         "string_view": "c",
         "vector": "c",
         "todo.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "fiobj_mustache.h": "c",
+        "todos_controller.h": "c"
     }
 }
