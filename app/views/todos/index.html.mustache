@@ -79,8 +79,7 @@
 						<a id="filter-completed" href="#/completed" onClick='filterOnly("completed")'>Completed</a>
 					</li>
 				</ul>
-				<!-- Hidden if no completed items are left ↓ -->
-				<button class="clear-completed" hx-delete="/todos/clear_completed" hx-target="body" hx-swap="outerHTML">Clear completed</button>
+				<button class="clear-completed" hx-delete="/todos" hx-target="body" hx-swap="outerHTML">Clear completed</button>
 			</footer>
 		</section>
 		<footer class="info">
