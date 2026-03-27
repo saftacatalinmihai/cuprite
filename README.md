@@ -7,7 +7,7 @@ Cuprite is an experimental web framework written in C, leveraging the high-perfo
 To generate a new model, run the following command:
 
 ```bash
-ruby scripts/generate_model.rb <model_name>
+make generate_model model=<model_name>
 ```
 
 This will look for `model_name.h` under `src/models` and generate the `h` and `c` files for the model in the `src/models/generated` directory, along with a migration file in `db/migrations`.
@@ -33,7 +33,7 @@ This will update your database schema to match the latest model definitions.
 To start the Cuprite web server, run the following command:
 
 ```bash
-./bin/cuprite
+make start
 ```
 
 The server will start and listen for requests on port 3001.

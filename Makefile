@@ -42,6 +42,10 @@ run: compile
 migrate: compile
 	@$(EXECUTABLE) migrate
 
+# Usage: make generate_model model=<model_name (e.g., Product)>
+generate_model:
+	@ruby scripts/generate_model.rb $(model)
+
 clean:
 	rm -rf $(BINDIR)
 	rm -rf $(FACIL_IO_DIR)
