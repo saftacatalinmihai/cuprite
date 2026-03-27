@@ -49,16 +49,23 @@ void products_index(http_s* request) {
     Product** products = product_all(&count);
 
     FIOBJ products_ary = fiobj_ary_new();
+    FIOBJ name_key = fiobj_str_new("name", 4);
+    FIOBJ id_key = fiobj_str_new("id", 2);
+    FIOBJ products_key = fiobj_str_new("products", 8);
+    
     for (int i = 0; i < count; i++) {
         FIOBJ product_hash = fiobj_hash_new();
-        fiobj_hash_set(product_hash, fiobj_str_new("name", 4), fiobj_str_new(products[i]->name, strlen(products[i]->name)));
-        fiobj_hash_set(product_hash, fiobj_str_new("id", 2), fiobj_num_new(products[i]->id));
+        fiobj_hash_set(product_hash, name_key, fiobj_str_new(products[i]->name, strlen(products[i]->name)));
+        fiobj_hash_set(product_hash, id_key, fiobj_num_new(products[i]->id));
         fiobj_ary_push(products_ary, product_hash);
     }
 
     FIOBJ data = fiobj_hash_new();
-    fiobj_hash_set(data, fiobj_str_new("products", 8), products_ary);
+    fiobj_hash_set(data, products_key, products_ary);
     render(request, "products/index", data);
+    fiobj_free(name_key);
+    fiobj_free(id_key);
+    fiobj_free(products_key);
     fiobj_free(data);
 
     for (int i = 0; i < count; i++) {

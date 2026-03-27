@@ -36,6 +36,7 @@
         "fiobj_numbers.h": "c",
         "fiobject.h": "c",
         "fiobj_hash.h": "c",
-        "routes.h": "c"
+        "routes.h": "c",
+        "__config": "c"
     }
 }

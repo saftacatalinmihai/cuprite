@@ -192,10 +192,12 @@ void route_request(http_s *request) {
         if (!request->params) {
           request->params = fiobj_hash_new();
         }
-        fiobj_hash_set(request->params, fiobj_str_new("id", 2),
+        FIOBJ id_str = fiobj_str_new("id", 2);
+        fiobj_hash_set(request->params, id_str,
                        fiobj_str_new(param_value, strlen(param_value)));
         // printf("Routing to route: %i\n", i);
         routes[i].action(request);
+        fiobj_free(id_str);
         clock_t end = clock();
         double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
         printf("Route duration %f s, %f millis, %f micros, %f nanos\n",
@@ -289,10 +291,10 @@ static mustache_s *load_template(char *path) {
   }
 #endif
 
-  fprintf(stderr, "Loading template: %s\n", path);
+  // fprintf(stderr, "Loading template: %s\n", path);
   mustache_s *template =
       fiobj_mustache_load((fio_str_info_s){.data = path, .len = strlen(path)});
-  fprintf(stderr, "Loaded template: %s\n", path);
+  // fprintf(stderr, "Loaded template: %s\n", path);
 
 #if USE_TEMPLATE_HASH
   if (template) {
@@ -328,17 +330,21 @@ void render(http_s *request, char *view, FIOBJ data) {
   }
 
   FIOBJ view_content_obj = fiobj_mustache_build(view_template, data);
+  free(view_template);
   fio_str_info_s view_content_str = fiobj_obj2cstr(view_content_obj);
-  fiobj_hash_set(data, fiobj_str_new("yield", 5),
+  FIOBJ yield_str = fiobj_str_new("yield", 5);
+  fiobj_hash_set(data, yield_str,
                  fiobj_str_new(view_content_str.data, view_content_str.len));
 
   FIOBJ response_body = fiobj_mustache_build(layout_template, data);
+  free(layout_template);
   fiobj_free(view_content_obj);
   fio_str_info_s body = fiobj_obj2cstr(response_body);
 
   http_set_header(request, HTTP_HEADER_CONTENT_TYPE,
                   http_mimetype_find("html", 4));
   http_send_body(request, body.data, body.len);
+  fiobj_free(yield_str);
 
   fiobj_free(response_body);
 }
@@ -484,6 +490,17 @@ void db_finalize(sqlite3_stmt *stmt) { sqlite3_finalize(stmt); }
 
 int migrate(void);
 
+int migrate(void) {
+  printf("Connecting to database...\n");
+  db_init_with_filename("cuprite.db");
+  printf("Running migrations...\n");
+  db_migrate();
+  printf("Closing database connection...\n");
+  db_thread_close();
+  printf("Migrations complete.\n");
+  return 0;
+}
+
 void on_request(http_s *request) { route_request(request); }
 
 void on_thread_exit(void *arg) {
@@ -531,21 +548,11 @@ int run(int argc, char *argv[]) {
 
   fio_state_callback_add(FIO_CALL_ON_FINISH, on_thread_exit, NULL);
   http_listen("3001", NULL, .on_request = on_request, .log = 1);
-  // fio_start();
-  fio_start(.threads = 2);
-  // fio_start(.threads = 4);
+  fio_start();
+  // fio_start(.threads = 1);
+  // fio_start(.threads = 2);
+  // fio_start(.threads = 16);
 
-  return 0;
-}
-
-int migrate(void) {
-  printf("Connecting to database...\n");
-  db_init_with_filename("cuprite.db");
-  printf("Running migrations...\n");
-  db_migrate();
-  printf("Closing database connection...\n");
-  db_thread_close();
-  printf("Migrations complete.\n");
   return 0;
 }
 

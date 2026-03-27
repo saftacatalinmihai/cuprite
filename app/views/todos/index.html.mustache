@@ -46,10 +46,10 @@
 			</section>
 			<!-- This footer should be hidden by default and shown when there are todos -->
 			<footer class="footer">
-				<span class="todo-count"><strong id="todo-count">{{remaining_count}}</strong> item left</span>
+				<span class="todo-count"><strong id="todoCount">{{remaining_count}}</strong> item left</span>
 				<script>
 					function updateTodoCount() { 
-						$("#todo-count").innerHTML = $$('.todo-list input[type="checkbox"]:not(:checked)').length 
+						todoCount.innerHTML = $$('.todo-list input[type="checkbox"]:not(:checked)').length 
 					}
 					new MutationObserver(updateTodoCount).observe( $('.todo-list'), { childList: true, subtree: true, attributes: true } );
 				</script>

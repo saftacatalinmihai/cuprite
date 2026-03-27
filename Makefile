@@ -8,7 +8,16 @@ APP_SOURCES = $(shell find $(APP_DIR) -type f -name '*.c')
 BINDIR = bin
 EXECUTABLE = $(BINDIR)/cuprite
 
-CFLAGS = -Wall -Wextra -std=c17 -g -I. \
+# 	-fsanitize=leak  # Does not work on macOS. Using the Instruments app instead.
+# 	-arch arm64 \
+# 	-fsanitize=address \
+# 	-O0 \
+# 	-O3 \
+
+CFLAGS = -Wall -Wextra \
+	-g \
+	-std=c11 \
+	-I. \
 	-I$(APP_DIR) \
 	-I$(FACIL_IO_DIR)/lib/facil \
 	-I$(FACIL_IO_DIR)/lib/facil/http \
